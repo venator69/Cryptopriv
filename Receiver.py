@@ -7,6 +7,22 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
+# Security Stacks 
+""" 
+    Integrity           : sha256 HASH
+    authentication      : RSA-PSS digital signature, transmitter public key
+    Confidentiality     : AES-GCM symmetrical encryption for messages, RSA-OAEP for AES key
+    Non-Repudiation     : RSA digital signature
+"""
+# Flow
+"""
+    Transmitter and receiver generate public and private key using RSA keys -> 
+    -> Transmitter's payload is received -> 
+    -> Digital signature is using transmitters public key using RSS-> 
+    -> AES key is decrypted using Receivers private key ->
+    -> Message is decrypted using decrypted AES key -> 
+    -> Hash is checked for message integrity
+"""
 
 # RSA KEY FUNCTIONS
 def generate_rsa_keys():
@@ -155,14 +171,14 @@ if not valid:
 # Decrypt AES key
 print("\nDECRYPT AES KEY")
 aes_key = rsa_decrypt_key(receiver_private, encrypted_aes_key)
-print("[+] AES key berhasil didekripsi")
+print("AES key berhasil didekripsi")
 
 # Decrypt pesan
 print("\nDECRYPT PESAN")
 plaintext = aes_decrypt(aes_key, nonce, ciphertext)
 print("Pesan hasil dekripsi:", plaintext.decode())
 
-# STEP 6: Integrity check
+# Integrity check
 print("\nINTEGRITY CHECK")
 decrypted_hash = sha256_hash(plaintext)
 print("Hash setelah dekripsi:", decrypted_hash)

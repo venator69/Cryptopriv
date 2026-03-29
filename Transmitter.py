@@ -7,10 +7,24 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-# Encryption Flow : message ->  
-
+# Security Stacks 
+""" 
+    Integrity           : sha256 HASH
+    authentication      : RSA-PSS digital signature, transmitter public key
+    Confidentiality     : AES-GCM symmetrical encryption for messages, RSA-OAEP for AES key
+    Non-Repudiation     : RSA digital signature
+"""
+# Flow
+"""
+    Transmitter and receiver generate public and private key using RSA keys -> 
+    -> Receiver's Public keys is sent to transmitter -> 
+    -> Message is inputted in tranceiver -> 
+    -> Message is symmetrically encrypted using AES creating nonce, ciphertext, and key ->
+    -> key is asymmetrically encrypted using RSA OAEP, using RECEIVER's public key -> 
+    -> digital signature is made using transmitters private keys
+"""
 # CONFIG
-SERVER_IP = "192.168.40.128" # Ganti ke SERVER_IP dari VM
+SERVER_IP = "100.99.107.98" # Ganti ke SERVER_IP dari VM
 PORT = 5000
 
 # Asymetric Encription  : RSA key Function
@@ -111,7 +125,7 @@ receiver_public_pem = packet["public_key"]
 receiver_public = load_public_key_from_pem(receiver_public_pem)
 print("Receiver public key diterima")
 
-# Siapkan pesan
+# Siapkan pesan -> ubah menjadi bytes
 message = input("Masukkan pesan yang ingin dikirim: ").encode()
 print("\nPesan asli:", message.decode())
 
@@ -122,7 +136,7 @@ print("Hash pesan:", msg_hash)
 # AES encrypt
 aes_key, nonce, ciphertext = aes_encrypt(message)
 
-# RSA encrypt AES key
+# Encrypt AES_Key dengan RSA dengan receiver public key
 encrypted_aes_key = rsa_encrypt_key(receiver_public, aes_key)
 
 # Sign ciphertext
@@ -131,7 +145,7 @@ signature = sign_data(sender_private, ciphertext)
 # Sender public key
 sender_public_pem = public_key_to_pem(sender_public)
 
-# Kirim semuanya ke receiver
+# Kirim semuanya ke receiver dengan json payload
 payload = {
     "sender_public_key": sender_public_pem,
     "encrypted_aes_key": base64.b64encode(encrypted_aes_key).decode(),
