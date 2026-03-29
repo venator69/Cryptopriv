@@ -8,9 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 
-# =========================================================
 # RSA KEY FUNCTIONS
-# =========================================================
 def generate_rsa_keys():
     private_key = rsa.generate_private_key(
         public_exponent=65537,
@@ -31,27 +29,21 @@ def load_public_key_from_pem(pem_data: str):
     return serialization.load_pem_public_key(pem_data.encode())
 
 
-# =========================================================
 # HASH
-# =========================================================
 def sha256_hash(data: bytes) -> str:
     digest = hashes.Hash(hashes.SHA256())
     digest.update(data)
     return digest.finalize().hex()
 
 
-# =========================================================
 # AES DECRYPT
-# =========================================================
 def aes_decrypt(aes_key: bytes, nonce: bytes, ciphertext: bytes):
     aesgcm = AESGCM(aes_key)
     plaintext = aesgcm.decrypt(nonce, ciphertext, None)
     return plaintext
 
 
-# =========================================================
 # RSA DECRYPT AES KEY
-# =========================================================
 def rsa_decrypt_key(private_key, encrypted_key: bytes):
     return private_key.decrypt(
         encrypted_key,
@@ -63,9 +55,7 @@ def rsa_decrypt_key(private_key, encrypted_key: bytes):
     )
 
 
-# =========================================================
-# VERIFY SIGNATURE
-# =========================================================
+# Verify Signature
 def verify_signature(public_key, data: bytes, signature: bytes):
     try:
         public_key.verify(
@@ -82,9 +72,7 @@ def verify_signature(public_key, data: bytes, signature: bytes):
         return False
 
 
-# =========================================================
-# SOCKET HELPERS
-# =========================================================
+# Socket Helpers
 def send_json(conn, obj):
     data = json.dumps(obj).encode()
     conn.sendall(len(data).to_bytes(4, "big"))
@@ -107,12 +95,12 @@ def recv_json(conn):
     return json.loads(data.decode())
 
 
-# SERVER
+# Server
 HOST = "0.0.0.0"
 PORT = 5000
 
 
-print("=== RECEIVER / SERVER ===")
+print("RECEIVER")
 
 # Receiver key pair
 receiver_private, receiver_public = generate_rsa_keys()
@@ -121,11 +109,11 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, PORT))
 server.listen(1)
 
-print(f"[+] Receiver listening on {HOST}:{PORT}")
-print("[+] Menunggu transmitter connect...")
+print(f"Receiver listening on {HOST}:{PORT}")
+print("Menunggu transmitter connect...")
 
 conn, addr = server.accept()
-print(f"[+] Connected by {addr}")
+print(f"Connected by {addr}")
 
 #Kirim public key receiver ke transmitter
 receiver_public_pem = public_key_to_pem(receiver_public)
@@ -165,17 +153,17 @@ if not valid:
     server.close()
 
 # Decrypt AES key
-print("\n=== DECRYPT AES KEY ===")
+print("\nDECRYPT AES KEY")
 aes_key = rsa_decrypt_key(receiver_private, encrypted_aes_key)
 print("[+] AES key berhasil didekripsi")
 
 # Decrypt pesan
-print("\n=== DECRYPT PESAN ===")
+print("\nDECRYPT PESAN")
 plaintext = aes_decrypt(aes_key, nonce, ciphertext)
 print("Pesan hasil dekripsi:", plaintext.decode())
 
 # STEP 6: Integrity check
-print("\n=== INTEGRITY CHECK ===")
+print("\nINTEGRITY CHECK")
 decrypted_hash = sha256_hash(plaintext)
 print("Hash setelah dekripsi:", decrypted_hash)
 print("Integrity:", "SAMA" if decrypted_hash == original_hash else "BERUBAH")
