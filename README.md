@@ -10,12 +10,12 @@
 ### Cryptography library installed using "pip install cryptography"
 
 # Steps:
-### Bob runs Receiver.py first: python3 Receiver.py
-### Bob notes down his Tailscale IP and then gives it to Alice.
-### Alice changes the SERVER_IP value in Transmitter.py to Bob’s Tailscale IP.
-### Alice runs Transmitter.py: python Transmitter.py
-### Alice enters the message she wants to send when prompted, then presses Enter.
-### The output on both terminals shows the encryption result on Alice’s side, and the decryption and verification results on Bob’s side.
+1. Bob runs Receiver.py first: python3 Receiver.py
+2. Bob notes down his Tailscale IP and then gives it to Alice.
+3. Alice changes the SERVER_IP value in Transmitter.py to Bob’s Tailscale IP.
+4. Alice runs Transmitter.py: python Transmitter.py
+5. Alice enters the message she wants to send when prompted, then presses Enter.
+6. The output on both terminals shows the encryption result on Alice’s side, and the decryption and verification results on Bob’s side.
 
 
 # Flow Transmitter
