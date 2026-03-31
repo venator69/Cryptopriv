@@ -5,6 +5,19 @@
 ###    Confidentiality     : AES-GCM symmetrical encryption for messages, RSA-OAEP for AES key
 ###    Non-Repudiation     : RSA digital signature
 
+# Requirements :
+### Python 3.x installed in 2 devices
+### Cryptography library installed using "pip install cryptography"
+
+# Steps:
+### Bob runs Receiver.py first: python3 Receiver.py
+### Bob notes down his Tailscale IP and then gives it to Alice.
+### Alice changes the SERVER_IP value in Transmitter.py to Bob’s Tailscale IP.
+### Alice runs Transmitter.py: python Transmitter.py
+### Alice enters the message she wants to send when prompted, then presses Enter.
+### The output on both terminals shows the encryption result on Alice’s side, and the decryption and verification results on Bob’s side.
+
+
 # Flow Transmitter
 
 1. Transmitter and receiver generate public and private key using RSA keys
